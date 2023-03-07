@@ -2,12 +2,16 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 
+#
+g = 9.81
+B = 5*(10**-5)
+
 #declaring data
 x1 = [0.6,1.2,1.8,2.4,3,3.6]
-y1 = [0.1,0.22,0.34,0.43,0.56,0.64]
+y1 = [0.0001,0.00022,0.00034,0.00043,0.00056,0.00064]
 
 x2 = [0.4,0.8,1.2,1.6,2,2.4]
-y2 = [0.08,0.19,0.28,0.39,0.47,0.58]
+y2 = [0.00008,0.00019,0.00028,0.00039,0.00047,0.00058]
 
 x3 = [1,2,3,4,5,5.88]
 y3 = [3.441,4.615,6.575,7.5,8.496,9.057]
@@ -74,19 +78,23 @@ def sumDistance(x,m,c):
 
 #calculate gradient
 def gradient(x,y,centroidX,centroidY):
-    mReal = 0
-    i = 0
-    currentSumDistance = 1000
-    while i < len(x): 
-        m = (centroidY - y[i])/(centroidX - x[i])
-        c = yIntercept(centroidX,centroidY,m)
-        sumDistancePoints = sumDistance(x,m,c)
-        #print(sumDistancePoints)
-        if(sumDistancePoints < currentSumDistance):
-            currentSumDistance = sumDistancePoints
-            mReal = m
-        i+=1
-    return mReal
+    yMinusMeanY = []
+    xMinusMeanX = []
+    
+    for i in range(0,len(x)-1):
+        xMinusMeanX.append(x[i]-centroidX)
+        yMinusMeanY.append(y[i]-centroidY)
+    
+    sumXMinusMeanXSquared = 0
+    productXY = 0
+    
+    for i in range(0,len(xMinusMeanX)-1):
+        sumXMinusMeanXSquared += xMinusMeanX[i]**2
+        productXY += xMinusMeanX[i] * yMinusMeanY[i]
+        
+    m = productXY/sumXMinusMeanXSquared
+    
+    return m
 
 #calculate the y-intercept
 def yIntercept(x,y,m):
@@ -104,27 +112,38 @@ sumDistance1 = sumDistance(x1, m1, c1)
 sumDistance2 = sumDistance(x2, m2, c2)
 #end of best fit algorithm
 
+#calculation of the lenght of current carrying conductor
+
+def L(m):
+    lenght = m*(g/B)
+    return lenght 
+
+L1 = L(round(m1,6))
+L2 = L(round(m2,6))
+
 #appending y intercept to the data point 
-x1 = np.append(x1,0)
-y1 = np.append(y1,c1)
+# x1 = np.append(x1,0)
+# y1 = np.append(y1,c1)
 
-x2 = np.append(x2,0)
-y2 = np.append(y2,c2)
+# x2 = np.append(x2,0)
+# y2 = np.append(y2,c2)
 
-x3 = np.append(x3, 0)
-y3 = np.append(y3,c3)
+# x3 = np.append(x3, 0)
+# y3 = np.append(y3,c3)
 
 plt.figure(figsize=(8,6), dpi=300)
 
+x = np.linspace(0,3.8)
+
 plt.scatter(x1,y1, marker = 'x', color = 'blue')
 plt.scatter(centroidX1, centroidY1, marker= 'x', color = 'blue')
-plt.plot(x1,f(x1,m1,c1), color  = 'blue', label = "L1")
-print("gradient L1: " , round(m1,3))
+plt.plot(x,f(x,m1,c1), color  = 'blue', label = "L1")
+print("gradient L1: " , round(m1,6), "lenght of L1: ", round(L1, 3), 'm')
 
 plt.scatter(x2,y2, marker='x', color = 'green')
 plt.scatter(centroidX2, centroidY2, marker= 'x', color='green')
-plt.plot(x2,f(x2,m2,c2), color = 'green', label="L2")
-print("gradient L2: " , round(m2, 3))
+plt.plot(x,f(x,m2,c2), color = 'green', label="L2")
+print("gradient L2: " , round(m2, 6), "lenght of L2: ", round(L2, 3), 'm')
 
 plt.title("Mass(M) against Current(I)")
 plt.ylabel("Mass (M)")
